@@ -1,4 +1,5 @@
 class Fan < ActiveRecord::Base
+  has_many :donations
   validates :name,  presence: true,
                     format: {with: /\A[a-zA-Z]+\z/, message: "only allows uppercase and lowercase letters"}
 
@@ -8,11 +9,18 @@ class Fan < ActiveRecord::Base
 
   validate :no_dicks
 
-  belongs_to :location 
+  belongs_to :location
+
+  default_scope { order(:name) }
 
   def no_dicks
     errors.add(:name, "cannot be Dick") if name == "Dick"
   end
 
-  has_many :donations
+  def self.joined_since(date)
+    # formatted_date = Time.new(date)
+    # require "pry"; binding.pry
+    all.where("created_at < ?", date)
+  end
+
 end
